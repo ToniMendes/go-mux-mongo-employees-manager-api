@@ -15,13 +15,22 @@ import (
 type Employee struct {
 	ID     bson.ObjectID `bson:"_id,omitempty"`
 	Name   string        `bson:"name"`
+	Email  string        `bson:"email"`
 	State  string        `bson:"state"`
 	Status string        `bson:"status"`
 }
 
-func NewEmployee(name string, state, status string) (*Employee, error) {
+func NewEmployee(name, email, state, status string) (*Employee, error) {
 	if strings.TrimSpace(state) == "" || strings.TrimSpace(status) == "" {
 		return nil, fmt.Errorf("%s", resources.NoneOfTheValuesCanBeEmpty)
+	}
+
+	if email == "" {
+		return nil, fmt.Errorf("%s", resources.EmailCannotBeEmpty)
+	}
+
+	if !strings.Contains(email, "@") || !strings.Contains(email, ".com") {
+		return nil, fmt.Errorf("%s", resources.EmailInvalid)
 	}
 
 	name, err := formatName(name)
@@ -41,6 +50,7 @@ func NewEmployee(name string, state, status string) (*Employee, error) {
 
 	return &Employee{
 		Name:   name,
+		Email:  email,
 		State:  state,
 		Status: status,
 	}, nil

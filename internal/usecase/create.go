@@ -8,6 +8,7 @@ import (
 
 type UseCaseDtoInput struct {
 	Name   string
+	Email  string
 	State  string
 	Status string
 }
@@ -23,7 +24,7 @@ func NewCreateUseCase(collection domain.MongoRepository) *CreateUseCase {
 }
 
 func (repo *CreateUseCase) Create(dto UseCaseDtoInput) error {
-	model, err := entities.NewEmployee(dto.Name, dto.State, dto.Status)
+	model, err := entities.NewEmployee(dto.Name, dto.Email, dto.State, dto.Status)
 	if err != nil {
 		return err
 	}
