@@ -24,6 +24,9 @@ func main() {
 			log.Fatal(err.Error())
 		}
 	}()
+
+	err = mongodb.UniqueIndexInMongoCollection(coll)
+	returnFatalError(err)
 	
 	mongoRepo := mongodb.NewMongoRepo(coll)
 
