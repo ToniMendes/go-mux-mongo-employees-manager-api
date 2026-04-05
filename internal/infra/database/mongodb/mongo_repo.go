@@ -22,9 +22,9 @@ func NewMongoRepo(collection *mongo.Collection) *MongoRepo {
 	}
 }
 
-func UniqueIndexInMongoCollection(collection *mongo.Collection) error{
+func UniqueIndexInMongoCollection(collection *mongo.Collection) error {
 	model := mongo.IndexModel{
-		Keys: bson.D{{Key: "email", Value: 1}},
+		Keys:    bson.D{{Key: "email", Value: 1}},
 		Options: options.Index().SetUnique(true),
 	}
 
@@ -46,3 +46,22 @@ func (repo *MongoRepo) Insert(model *entities.Employee) error {
 
 	return nil
 }
+
+func (repo *MongoRepo) UpdateStatusByEmail(model *entities.UpdateOnlyStatus) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	filter := bson.M{"email": model.Email}
+
+	update := bson.M{
+		"$set": bson.M{"status": model.Status},
+	}
+
+	_, err := repo.Collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return err
+	} 
+
+	return nil
+}
+

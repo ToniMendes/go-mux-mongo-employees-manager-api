@@ -4,5 +4,6 @@ package domain
 import "go-mux-mongo-employees-manager/internal/domain/entities"
 
 type MongoRepository interface {
-	Insert(model *entities.Employee) error
+	Insert(*entities.Employee) error
+	UpdateStatusByEmail(*entities.UpdateOnlyStatus) error
 }

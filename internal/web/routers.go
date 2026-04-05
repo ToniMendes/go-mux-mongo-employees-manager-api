@@ -12,6 +12,7 @@ func Routers(router *Handler, port string) error {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/api/employees/signup", router.AddNewEmployee).Methods("POST")
+	r.HandleFunc("/api/employees/update/status", router.UpdateStatusEmployee).Methods("PUT")
 
 	err := http.ListenAndServe(":8080", r)
 	if err != nil {

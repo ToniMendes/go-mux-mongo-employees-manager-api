@@ -17,7 +17,7 @@ func main() {
 	err := configs.StartConfig()
 	returnFatalError(err)
 
-	conn,coll := StartMongoDB()
+	conn, coll := StartMongoDB()
 	defer func() {
 		err := conn.Disconnect(context.Background())
 		if err != nil {
@@ -25,19 +25,19 @@ func main() {
 		}
 	}()
 
-	err = mongodb.UniqueIndexInMongoCollection(coll)
-	returnFatalError(err)
-	
 	mongoRepo := mongodb.NewMongoRepo(coll)
 
 	createUseCase := usecase.NewCreateUseCase(mongoRepo)
+	updateStatusUseCase := usecase.NewUpdateUseCase(mongoRepo)
 
 	type handler struct {
 		*usecase.CreateUseCase
+		*usecase.UpdateUseCase
 	}
 
 	hub := handler{
 		createUseCase,
+		updateStatusUseCase,
 	}
 
 	usecase := web.NewHandler(hub)
@@ -55,7 +55,12 @@ func StartMongoDB() (*mongo.Client, *mongo.Collection) {
 
 	client := database.NewDatabase(conn)
 
-	return conn, mongodb.GetCollection(client.MongoConn, configs.Env.MongoDB, configs.Env.MongoCollection)
+	coll := mongodb.GetCollection(client.MongoConn, configs.Env.MongoDB, configs.Env.MongoCollection)
+
+	err = mongodb.UniqueIndexInMongoCollection(coll)
+	returnFatalError(err)
+
+	return conn, coll
 }
 
 func returnFatalError(err error) {

@@ -20,12 +20,17 @@ type Employee struct {
 	Status string        `bson:"status"`
 }
 
+type UpdateOnlyStatus struct {
+	Email  string `bson:"email"`
+	Status string `bson:"status"`
+}
+
 func NewEmployee(name, email, state, status string) (*Employee, error) {
 	if strings.TrimSpace(state) == "" || strings.TrimSpace(status) == "" {
 		return nil, fmt.Errorf("%s", resources.NoneOfTheValuesCanBeEmpty)
 	}
 
-	if email == "" {
+	if strings.TrimSpace(email) == "" {
 		return nil, fmt.Errorf("%s", resources.EmailCannotBeEmpty)
 	}
 
@@ -66,4 +71,29 @@ func formatName(name string) (string, error) {
 	caser := cases.Title(language.BrazilianPortuguese)
 
 	return caser.String(nameFormated), nil
+}
+
+func NewUpdateOnlyStatus(status, email string) (*UpdateOnlyStatus, error) {
+	if strings.TrimSpace(email) == "" {
+		return nil, fmt.Errorf("%s", resources.EmailCannotBeEmpty)
+	}
+
+	if !strings.Contains(email, "@") || !strings.Contains(email, ".com") {
+		return nil, fmt.Errorf("%s", resources.EmailInvalid)
+	}
+
+	if status != "0" && status != "1" {
+		return nil, fmt.Errorf("%s", resources.StatusInvalid)
+	}
+
+	if status == "1" {
+		status = enum.StatusActive.String()
+	} else {
+		status = enum.StatusInactive.String()
+	}
+
+	return &UpdateOnlyStatus{
+		Status: status,
+		Email:  email,
+	}, nil
 }
